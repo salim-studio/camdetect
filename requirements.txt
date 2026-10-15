@@ -1,0 +1,8 @@
+# camdetect — بديل عملي سريع لـ clearcam
+# Core deps only (YOLO optional for speed/offline-first)
+opencv-python>=4.8,<5
+numpy>=1.26
+Flask>=3.0
+# Optional (auto-used if installed — faster/accurate AI):
+# ultralytics>=8.2   # YOLOv8n — pip install ultralytics
+# requests>=2.31      # for telegram/webhook retries (urllib fallback exists)

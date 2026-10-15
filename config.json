@@ -1,0 +1,32 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8080
+  },
+  "inference": {
+    "engine": "auto",
+    "imgsz": 480,
+    "conf": 0.45,
+    "frame_skip": 2,
+    "motion_gate": true,
+    "motion_threshold": 1.2
+  },
+  "tracking": {
+    "max_disappeared": 25,
+    "max_distance": 90,
+    "min_speed": 0.0
+  },
+  "alerts": {
+    "cooldown_sec": 20,
+    "save_thumbs": true,
+    "save_clips": false,
+    "classes": []
+  },
+  "notify": {
+    "webhook_url": "",
+    "telegram_bot": "",
+    "telegram_chat": "",
+    "enabled": true
+  },
+  "cameras": []
+}
