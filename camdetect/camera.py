@@ -1,5 +1,5 @@
-"""إدارة الكاميرات — خيط التقاط واحد + خيط استدلال واحد لكل كاميرا.
-السر: queue بحجم 1 (الأحدث فقط) + frame_skip + motion gate => زمن استجابة منخفض دائماً.
+"""Camera manager — one capture thread + one inference thread per camera.
+The trick: a size-1 queue (latest frame only) + frame_skip + motion gate => always low latency.
 """
 import cv2
 import threading
@@ -123,7 +123,7 @@ class Camera:
             self.fps = self.fps * 0.85 + inst * 0.15
             self.frames += 1
             inf = self.cfg.get("inference", {})
-            # motion gate: تخطي الاستدلال الثقيل إن لم توجد حركة
+            # motion gate: skip heavy inference when nothing is moving
             dets = []
             do_infer = (n % self.skip == 0)
             motion = self.gate.amount(frame)
@@ -167,7 +167,7 @@ class Camera:
                 y2 = t.cy + 60 if b is None else b["y2"]
                 if t.age >= 2:
                     draw_box(ann, x1, y1, x2, y2, t.label, t.id)
-                # event مرة واحدة لكل track جديد (يمنع التكرار + أسرع من clearcam)
+                # fire event once per new track (dedupes alerts)
                 if t.age == 2 and (not allowed or t.label in allowed or str(t.cls) in allowed):
                     key = (t.id, t.label)
                     if key not in self._seen_tracks:

@@ -1,4 +1,4 @@
-"""التنبيهات — webhook + Telegram + Pushover مع cooldown لمنع الإزعاج."""
+"""Notifications — webhook + Telegram with cooldown to prevent spam."""
 import json
 import threading
 import time

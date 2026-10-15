@@ -1,10 +1,10 @@
-"""مناطق الاهتمام (polygons) — داخل/خارج، أسرع من clearcam (numpy فقط)."""
+"""Zones of interest (polygons) — include/exclude filtering, numpy-free."""
 import cv2
 import numpy as np
 
 
 def point_in_poly(px, py, poly) -> bool:
-    """Ray-casting خالص بايثون — سريع لكميات صغيرة."""
+    """Pure-Python ray casting — fast enough for small polygons."""
     inside = False
     n = len(poly)
     if n < 3:
@@ -19,7 +19,7 @@ def point_in_poly(px, py, poly) -> bool:
 
 
 def box_center_in_zone(box, poly, w=1.0, h=1.0, invert=False) -> bool:
-    """box = [x1,y1,x2,y2] بكس normalized (0..1)."""
+    """box = [x1,y1,x2,y2] in normalized pixels (0..1)."""
     if not poly or len(poly) < 3:
         return True
     cx = (box[0] + box[2]) / 2
@@ -29,7 +29,7 @@ def box_center_in_zone(box, poly, w=1.0, h=1.0, invert=False) -> bool:
 
 
 def draw_zones(frame, zones):
-    """رسم شفاف للمناطق فوق الفريم (BGR)."""
+    """Draw translucent zones over the frame (BGR)."""
     if not zones:
         return frame
     ov = frame.copy()

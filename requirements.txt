@@ -1,5 +1,5 @@
-# camdetect — بديل عملي سريع لـ clearcam
-# Core deps only (YOLO optional for speed/offline-first)
+# camdetect — fast, lightweight AI camera surveillance (no ffmpeg, no GPU)
+# Core deps only — YOLO is optional and auto-detected.
 opencv-python>=4.8,<5
 numpy>=1.26
 Flask>=3.0

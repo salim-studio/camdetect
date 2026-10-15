@@ -1,6 +1,6 @@
-"""الكشف السريع — 3 محركات بتدرج السرعة/الدقة:
-yolo (اختياري, دقيق) -> hog (أشخاص, بدون تحميل) -> motion (دائماً يعمل).
-+ بوابة حركة (motion gate) لتخطي YOLO في الفريمات الساكنة = أسرع 3-5x من clearcam.
+"""Fast detection — 3 engines ordered by speed/accuracy:
+yolo (optional, accurate) -> hog (people, no downloads) -> motion (always works).
++ a motion gate that skips heavy inference on static frames (3-5x faster).
 """
 import cv2
 import numpy as np
@@ -21,7 +21,7 @@ COCO80 = ["person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", 
 
 
 class MotionGate:
-    """يكشف % البكسلات المتحركة — رخيص جداً (grayscale + blur + diff)."""
+    """Detects % of moving pixels — very cheap (grayscale + blur + diff)."""
     def __init__(self):
         self.prev = None
 
@@ -72,7 +72,7 @@ class Detector:
         self.conf = float(v)
 
     def detect(self, frame):
-        """-> list[{x1,y1,x2,y2,cls,label,conf}] بإحداثيات بكسل الفريم الأصلي."""
+        """-> list[{x1,y1,x2,y2,cls,label,conf}] in original frame pixel coordinates."""
         t0 = time.time()
         h, w = frame.shape[:2]
         scale = min(1.0, self.imgsz / max(h, w))
@@ -102,7 +102,7 @@ class Detector:
                                 "conf": float(min(0.99, 0.5 + float(wt) / 4))})
             except Exception:
                 pass
-        # motion fallback boxes (moving blobs) — فقط إن لم يوجد شيء آخر
+        # motion fallback boxes (moving blobs) — only if nothing else found
         if not out and self.engine == "motion":
             out = self._motion_boxes(frame)
         self.last_ms = (time.time() - t0) * 1000

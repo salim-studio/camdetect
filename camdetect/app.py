@@ -1,4 +1,4 @@
-"""camdetect web server — Flask خفيف: بث MJPEG + API + واجهة عربية/إنجليزية."""
+"""camdetect web server — lightweight Flask: MJPEG streaming + API + dashboard."""
 import cv2
 import time
 from pathlib import Path
@@ -37,7 +37,7 @@ def handle_event(cam, track, annotated):
     except Exception as e:
         print("[camdetect] thumb error:", e)
     notifier.send(f"🚨 {track.label} — {cam.name}",
-                  f"ثقة {track.conf:.2f} | {time.strftime('%H:%M:%S')}",
+                  f"confidence {track.conf:.2f} | {time.strftime('%H:%M:%S')}",
                   key=f"{cam.name}:{track.label}")
 
 
@@ -156,7 +156,7 @@ def set_cfg():
 
 @app.post("/api/notify_test")
 def notify_test():
-    ok = notifier.send("✅ camdetect يعمل", "رسالة اختبار ناجحة", key="test-now")
+    ok = notifier.send("✅ camdetect is running", "This is a test message", key="test-now")
     return jsonify({"queued": ok})
 
 

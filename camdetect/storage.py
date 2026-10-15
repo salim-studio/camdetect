@@ -1,4 +1,4 @@
-"""التخزين — SQLite (WAL) + صور مصغرة. بحث سريع بالفئة/الكاميرا/التاريخ/النص."""
+"""Storage — SQLite (WAL) + thumbnails. Fast search by class/camera/date/text."""
 import sqlite3
 import threading
 import time
@@ -80,7 +80,7 @@ class Store:
         return p / f"{eid}.jpg"
 
     def prune(self, max_days=30, max_events=20000):
-        """حذف القديم تلقائياً للحفاظ على المساحة (أسرع من clearcam الذي يراكم)."""
+        """Auto-delete old events to keep disk usage under control."""
         import time as _t
         cutoff = _t.time() - max_days * 86400
         with self.lock, self._con() as c:

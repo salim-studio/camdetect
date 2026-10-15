@@ -1,4 +1,4 @@
-"""متتبع centroid خفيف (أسرع بكثير من OC-SORT) — كافٍ للتنبيهات والعد."""
+"""Lightweight centroid tracker (much faster than Kalman-based trackers) — enough for alerts and counting."""
 import math
 
 
@@ -16,7 +16,7 @@ class Track:
 
 
 class CentroidTracker:
-    """مطابقة جشعة بالمسافة الإقليدية. O(n*m) صغير — يعمل بـ 500+ FPS."""
+    """Greedy Euclidean-distance matching. Small O(n*m) — runs at 500+ FPS."""
     def __init__(self, max_disappeared=25, max_distance=90):
         self.next_id = 1
         self.tracks: dict[int, Track] = {}
@@ -24,7 +24,7 @@ class CentroidTracker:
         self.max_distance = max_distance
 
     def update(self, dets):
-        """dets: list of dict(x1,y1,x2,y2,cls,label,conf) بإحداثيات بكسل."""
+        """dets: list of dict(x1,y1,x2,y2,cls,label,conf) in pixel coordinates."""
         if not dets:
             dead = []
             for t in self.tracks.values():

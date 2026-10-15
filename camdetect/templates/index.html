@@ -1,89 +1,162 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"/>
+<!doctype html><html lang="en"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>camdetect — كشف الكاميرات</title>
+<title>camdetect — AI Camera Surveillance</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%2322c55e' stroke-width='9'/><circle cx='50' cy='50' r='17' fill='%2322c55e'/></svg>"/>
 <style>
-:root{--bg:#0f1419;--card:#1a222c;--line:#2a3644;--txt:#eef3f7;--mut:#9fb0c0;--acc:#22c55e}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font-family:Segoe UI,Tahoma,Arial}
-header{display:flex;gap:12px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
-header h1{font-size:20px;margin:0}header h1 span{color:var(--acc)}
-main{padding:16px;max-width:1200px;margin:auto;display:grid;gap:16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
-.cam img{width:100%;border-radius:10px;background:#000;aspect-ratio:16/9;object-fit:cover}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-input,select,button{border-radius:10px;border:1px solid var(--line);background:#0c1116;color:var(--txt);padding:9px 12px;font-size:14px}
-button{background:var(--acc);color:#06280f;font-weight:700;cursor:pointer;border:none}
-button.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
-small{color:var(--mut)}.ev{display:flex;gap:10px;border-top:1px solid var(--line);padding:10px 0;align-items:center}
-.ev img{width:150px;border-radius:8px}.tag{background:#0c1116;border:1px solid var(--line);border-radius:20px;padding:2px 10px;font-size:12px}
-canvas{max-width:100%;border-radius:10px;cursor:crosshair}
-.badge{font-size:12px;color:var(--mut)}
+:root{--bg:#0b0f14;--bg2:#11161d;--card:#151c24;--line:#232d3a;--txt:#e9f0f6;--mut:#8ea0b3;--acc:#22c55e;--acc2:#0ea5e9;--danger:#ef4444;--r:14px;--shadow:0 8px 30px rgba(0,0,0,.35)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 500px at 70% -10%,rgba(34,197,94,.08),transparent 60%),radial-gradient(900px 400px at 10% 110%,rgba(14,165,233,.07),transparent 60%),var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,Arial,sans-serif}
+a{color:var(--acc2);text-decoration:none}
+header{display:flex;gap:14px;align-items:center;padding:14px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,15,20,.85);backdrop-filter:blur(10px);z-index:10}
+.logo{width:38px;height:38px;flex:none}
+.brand h1{font-size:19px;margin:0;letter-spacing:.5px}
+.brand h1 b{color:var(--acc);font-weight:800}
+.brand small{color:var(--mut);font-size:11.5px;letter-spacing:.4px}
+.spacer{flex:1}
+.pill{border:1px solid var(--line);background:var(--bg2);border-radius:99px;padding:6px 13px;color:var(--mut);font-size:12.5px;white-space:nowrap}
+main{padding:18px;max-width:1240px;margin:auto;display:grid;gap:16px}
+section.card{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+h3{margin:0 0 12px;font-size:15px;letter-spacing:.3px;display:flex;gap:8px;align-items:center}
+h3::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+input,select,button{border-radius:11px;border:1px solid var(--line);background:#0a0e13;color:var(--txt);padding:10px 13px;font-size:14px;outline:none;transition:.15s}
+input:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(34,197,94,.15)}
+button{background:linear-gradient(135deg,var(--acc),#16a34a);color:#052e16;font-weight:700;cursor:pointer;border:none;box-shadow:0 4px 14px rgba(34,197,94,.25)}
+button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+button.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);box-shadow:none}
+button.danger{background:transparent;border:1px solid rgba(239,68,68,.5);color:var(--danger);box-shadow:none}
+small,.badge{color:var(--mut)}
+.cam{position:relative;background:#0a0e13;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.cam .hdr{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;font-size:13px}
+.cam .hdr .st{font-size:11px;color:var(--acc);border:1px solid rgba(34,197,94,.35);border-radius:99px;padding:2px 9px}
+.cam img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#000}
+.ev{display:flex;gap:12px;border-top:1px solid var(--line);padding:11px 4px;align-items:center}
+.ev img{width:158px;border-radius:9px;border:1px solid var(--line)}
+.tag{background:#0a0e13;border:1px solid var(--line);border-radius:99px;padding:3px 11px;font-size:12px;color:var(--mut)}
+.tag.g{border-color:rgba(34,197,94,.4);color:var(--acc)}
+canvas{max-width:100%;border-radius:12px;border:1px solid var(--line);cursor:crosshair;background:#0a0e13}
+.footer{color:var(--mut);font-size:12.5px;text-align:center;padding:26px 10px 40px;border-top:1px solid var(--line);margin-top:8px}
+.footer b{color:var(--acc)}
+.statbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.kv{font-size:12.5px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
 </style></head><body>
-<header><h1>📷 camdetect <span>v1.0</span></h1><small>بديل سريع وخفيف لـ clearcam — بدون ffmpeg</small>
-<span style="flex:1"></span><button class="ghost" onclick="toggleLang()">EN / عربي</button></header>
+<header>
+<svg class="logo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="#22c55e" stroke-width="8"/><circle cx="50" cy="50" r="16" fill="#22c55e"/><circle cx="66" cy="34" r="7" fill="#0ea5e9"/></svg>
+<div class="brand"><h1><b>cam</b>detect</h1><small>AI CAMERA SURVEILLANCE · v1.0</small></div>
+<div class="spacer"></div>
+<span class="pill" id="statbar">loading…</span>
+</header>
+
 <main>
-<div class="card"><h3 data-ar="➕ إضافة كاميرا" data-en="➕ Add camera">➕ إضافة كاميرا</h3>
+
+<section class="card">
+<h3>➕ Cameras</h3>
 <div class="row">
-<input id="cname" placeholder="الاسم / name e.g. shop" style="width:160px"/>
-<input id="csrc" placeholder="المصدر: 0 أو RTSP أو رابط .mp4" style="flex:1;min-width:220px" dir="ltr"/>
-<button onclick="addCam()">إضافة</button>
-<button class="ghost" onclick="quickDemo()">تجربة webcam مباشرة (0)</button>
-</div><small data-ar="أمثلة: 0 للويب كام • rtsp://user:pass@192.168.1.10/stream • https://.../video.mp4 • ملف محلي C:/vid.mp4" data-en="Examples: 0 webcam • rtsp://... • https m3u8/mp4 • local file">أمثلة: 0 للويب كام • rtsp://user:pass@192.168.1.10/stream • https://.../video.mp4 • ملف محلي C:/vid.mp4</small>
-<div id="cams" style="margin-top:10px" class="row"></div></div>
+<input id="cname" placeholder="name e.g. front-door" style="width:180px"/>
+<input id="csrc" placeholder="source: 0 | rtsp://user:pass@ip/stream | C:/video.mp4 | https://…/stream.m3u8" style="flex:1;min-width:240px" dir="ltr"/>
+<button onclick="addCam()">Add camera</button>
+<button class="ghost" onclick="useWebcam()">Use webcam (0)</button>
+</div>
+<div id="cams" style="margin-top:10px" class="row"></div>
+</section>
 
-<div class="card"><h3>🔴 بث مباشر <span class="badge" id="stat"></span></h3><div id="live" class="grid"></div></div>
+<section class="card">
+<h3>🔴 Live view</h3>
+<div id="live" class="grid"></div>
+<div id="liveEmpty" class="badge">No cameras yet — add one above to start streaming.</div>
+</section>
 
-<div class="card"><h3 data-ar="🗺️ منطقة الاهتمام (اضغط على الصورة لرسم مضلع ثم حفظ)" data-en="🗺️ Zone (click snapshot to draw, then save)">🗺️ منطقة الاهتمام (اضغط على الصورة لرسم مضلع ثم حفظ)</h3>
-<div class="row"><select id="zcam"></select>
-<select id="zmode"><option value="include">داخل المنطقة فقط include</option><option value="exclude">تجاهل داخل المنطقة exclude</option></select>
-<button onclick="loadSnap()">📸 لقطة</button><button onclick="saveZone()">💾 حفظ المنطقة</button>
-<button class="ghost" onclick="clearZone()">مسح</button></div>
-<canvas id="zc"></canvas><div id="zpts" class="badge"></div></div>
+<section class="card">
+<h3>🗺️ Detection zone</h3>
+<div class="row">
+<select id="zcam"></select>
+<select id="zmode"><option value="include">Alert only INSIDE zone</option><option value="exclude">Ignore INSIDE zone</option></select>
+<button onclick="loadSnap()">📸 Snapshot</button>
+<button onclick="saveZone()">💾 Save zone</button>
+<button class="ghost" onclick="clearZone()">Clear</button>
+</div>
+<small>Click the snapshot to place polygon points, then save.</small>
+<canvas id="zc"></canvas><div id="zpts" class="badge" style="margin-top:6px"></div>
+</section>
 
-<div class="card"><h3>🔎 الأحداث والبحث</h3>
-<div class="row"><input id="q" placeholder="بحث: person / car / shop..." /><input id="fdate" type="date"/>
-<select id="flabel"><option value="">كل الفئات</option><option>person</option><option>car</option><option>cat</option><option>dog</option><option>motion</option></select>
-<button onclick="loadEvents()">بحث</button><button class="ghost" onclick="prune()">🧹 تنظيف القديم</button></div>
-<div id="evs"></div></div>
+<section class="card">
+<h3>🔎 Events & search</h3>
+<div class="row">
+<input id="q" placeholder="search text…" style="min-width:180px"/>
+<input id="fdate" type="date"/>
+<select id="flabel"><option value="">All classes</option><option>person</option><option>car</option><option>dog</option><option>cat</option><option>motion</option></select>
+<button onclick="loadEvents()">Search</button>
+<button class="ghost" onclick="prune()">🧹 Clean old</button>
+</div>
+<div id="evs" style="margin-top:6px"></div>
+</section>
 
-<div class="card"><h3>⚙️ الإعدادات والتنبيهات</h3><div class="row">
-<label>المحرك <select id="engine"><option>auto</option><option>yolo</option><option>hog</option><option>motion</option></select></label>
-<label>الدقة <input id="imgsz" type="number" value="480" style="width:80px"/></label>
-<label>الحساسية <input id="conf" type="number" step="0.05" value="0.45" style="width:80px"/></label>
-<label>تخطي <input id="skip" type="number" value="2" style="width:60px"/></label>
-<label>Cooldown <input id="cool" type="number" value="20" style="width:70px"/></label></div>
-<div class="row" style="margin-top:8px"><input id="webhook" placeholder="Webhook URL (discord/slack/home-assistant)" style="flex:1" dir="ltr"/>
-<input id="tgbot" placeholder="Telegram bot token" style="width:200px" dir="ltr"/><input id="tgchat" placeholder="chat id" style="width:120px" dir="ltr"/>
-<button onclick="saveCfg()">حفظ</button><button class="ghost" onclick="testNotify()">اختبار تنبيه</button></div>
-<small>للتليجرام: أنشئ بوت عبر @BotFather ثم أرسل رسالة للبوت وخذ chat id من getUpdates</small></div>
+<section class="card">
+<h3>⚙️ Settings & notifications</h3>
+<div class="row">
+<label class="kv">Engine <select id="engine"><option>auto</option><option>yolo</option><option>hog</option><option>motion</option></select></label>
+<label class="kv">Image size <input id="imgsz" type="number" value="480" style="width:84px"/></label>
+<label class="kv">Confidence <input id="conf" type="number" step="0.05" value="0.45" style="width:84px"/></label>
+<label class="kv">Frame skip <input id="skip" type="number" value="2" style="width:66px"/></label>
+<label class="kv">Cooldown (s) <input id="cool" type="number" value="20" style="width:76px"/></label>
+</div>
+<div class="row" style="margin-top:9px">
+<input id="webhook" placeholder="Webhook URL (Discord / Slack / Home Assistant)" style="flex:1;min-width:240px" dir="ltr"/>
+<input id="tgbot" placeholder="Telegram bot token" style="width:210px" dir="ltr"/>
+<input id="tgchat" placeholder="Telegram chat id" style="width:130px" dir="ltr"/>
+<button onclick="saveCfg()">Save</button>
+<button class="ghost" onclick="testNotify()">Test alert</button>
+</div>
+<small>Telegram: create a bot with @BotFather, message it, then read your chat id from getUpdates.</small>
+</section>
+
 </main>
+
+<div class="footer">camdetect · <b>MIT License</b> · © 2026 <b>salim-slimani</b> ·
+<a href="https://github.com/salim-studio/camdetect">github.com/salim-studio/camdetect</a></div>
+
 <script>
-let LANG='ar';
-function toggleLang(){LANG=LANG==='ar'?'en':'ar';document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
-document.querySelectorAll('[data-ar]').forEach(e=>e.textContent=e.dataset[LANG]);}
-async function api(u,o){const r=await fetch(u,o);return r.json();}
-async function refresh(){const s=await api('/api/stats');const lv=s.live||{};
-document.getElementById('stat').textContent=Object.entries(lv).map(([k,v])=>`${k}:${v.fps}fps/${v.det_ms}ms/${v.engine}/${v.status}`).join(' • ')||'لا كاميرات — أضف واحدة بالأعلى';
+async function api(u,o){const r=await fetch(u,o);return r.json().catch(()=>({}));}
+async function refresh(){
+const s=await api('/api/stats');const lv=s.live||{};
+const names=Object.keys(lv);
+document.getElementById('statbar').textContent=names.length
+? names.map(k=>`${k}: ${lv[k].fps} fps · ${lv[k].det_ms} ms · ${lv[k].engine}`).join('   |   ')
+: 'idle — add a camera to begin';
+const cams=(await api('/api/cameras')).filter(c=>c.name);
+document.getElementById('cams').innerHTML=cams.map(c=>`<span class="tag">${c.name} · <span dir="ltr">${c.src}</span> <a href="#" onclick="delCam('${c.name}');return false" title="delete">✖</a></span>`).join('')||'<span class="badge">no cameras</span>';
+const zs=document.getElementById('zcam');zs.innerHTML=cams.map(c=>`<option>${c.name}</option>`).join('');
 const box=document.getElementById('live');box.innerHTML='';
-const cl=await api('/api/cameras');const cams=cl.filter(x=>x.name);
-document.getElementById('cams').innerHTML=cams.map(c=>`<span class="tag">${c.name} • ${c.src} <a href="#" onclick="delCam('${c.name}');return false">✖</a></span>`).join('')||'<small>لا كاميرات بعد</small>';
-document.getElementById('zcam').innerHTML=cams.map(c=>`<option>${c.name}</option>`).join('');
-for(const c of cams){box.innerHTML+=`<div class="cam card"><b>${c.name}</b> <small>${lv[c.name]?.engine||''} ${lv[c.name]?.fps||''}fps</small><img loading="lazy" src="/stream/${c.name}"/></div>`;}}
-async function addCam(){const name=cname.value.trim(),src=csrc.value.trim();if(!name||!src)return alert('name+src');const r=await api('/api/cameras',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,src})});if(r.error)alert(r.error);csrc.value='';refresh();}
-async function quickDemo(){csrc.value='0';cname.value=cname.value||'webcam';addCam();}
-async function delCam(n){if(!confirm('حذف '+n+'؟'))return;await fetch('/api/cameras/'+n,{method:'DELETE'});refresh();}
-async function loadEvents(){const p=new URLSearchParams({q:q.value,date:fdate.value,label:flabel.value,limit:100});const rows=await api('/api/events?'+p);
-evs.innerHTML=rows.map(e=>`<div class="ev">${e.thumb_url?`<img src="${e.thumb_url}"/>`:''}<div><b>${e.label}</b> <span class="tag">${e.cam}</span> <span class="tag">${Math.round((e.conf||0)*100)}%</span><br/><small>${e.time} • track #${e.track_id}</small></div></div>`).join('')||'<small>لا نتائج</small>';}
+document.getElementById('liveEmpty').style.display=cams.length?'none':'block';
+for(const c of cams){box.innerHTML+=`<div class="cam"><div class="hdr"><b>${c.name}</b><span class="st">${lv[c.name]?lv[c.name].status:'…'}</span></div><img loading="lazy" src="/stream/${c.name}"/></div>`;}
+}
+async function addCam(){const name=cname.value.trim(),src=csrc.value.trim();if(!name||!src){alert('Name and source are required');return;}
+const r=await api('/api/cameras',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,src})});
+if(r.error){alert(r.error);return;}csrc.value='';refresh();}
+function useWebcam(){if(!cname.value.trim())cname.value='webcam';csrc.value='0';addCam();}
+async function delCam(n){if(!confirm(`Delete camera "${n}"?`))return;await fetch('/api/cameras/'+n,{method:'DELETE'});refresh();}
+async function loadEvents(){const p=new URLSearchParams({q:q.value,date:fdate.value,label:flabel.value,limit:100});
+const rows=await api('/api/events?'+p);
+evs.innerHTML=rows.map(e=>`<div class="ev">${e.thumb_url?`<img loading="lazy" src="${e.thumb_url}"/>`:'<div style="width:158px"></div>'}
+<div><b>${e.label}</b> <span class="tag">${e.cam}</span> <span class="tag g">${Math.round((e.conf||0)*100)}%</span><br/><small>${e.time} · track #${e.track_id}</small></div></div>`).join('')||'<div class="badge" style="padding:10px 0">No events found.</div>';}
 let poly=[];
-async function loadSnap(){const cam=zcam.value;if(!cam)return;const img=new Image();img.crossOrigin='';img.src='/snap/'+cam+'?t='+Date.now();
-img.onload=()=>{const c=zc;c.width=img.width;c.height=img.height;const x=c.getContext('2d');x.drawImage(img,0,0);poly=[];zpts.textContent='اضغط لرسم النقاط...';
-c.onclick=(ev)=>{const r=c.getBoundingClientRect();const px=(ev.clientX-r.left)/r.width,py=(ev.clientY-r.top)/r.height;poly.push([+px.toFixed(3),+py.toFixed(3)]);
-x.drawImage(img,0,0);x.fillStyle='rgba(34,197,94,.35)';x.beginPath();poly.forEach((p,i)=>i?x.lineTo(p[0]*c.width,p[1]*c.height):x.moveTo(p[0]*c.width,p[1]*c.height));x.closePath();x.fill();x.strokeStyle='#22c55e';x.stroke();
-zpts.textContent=JSON.stringify(poly);};};}
-function clearZone(){poly=[];zpts.textContent='';}
-async function saveZone(){const cam=zcam.value;await api('/api/zones/'+cam,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({zones:poly.length>=3?[{poly,mode:zmode.value}]:[]})});alert('تم الحفظ ✅');}
-async function saveCfg(){await api('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({inference:{engine:engine.value,imgsz:+imgsz.value,conf:+conf.value,frame_skip:+skip.value},alerts:{cooldown_sec:+cool.value},notify:{webhook_url:webhook.value,telegram_bot:tgbot.value,telegram_chat:tgchat.value}})});alert('تم ✅');}
-async function testNotify(){const r=await api('/api/notify_test',{method:'POST'});alert(r.queued?'أُرسل (إن كان webhook/telegram مضبوطاً) ✅':'مكتوم: تحقق من cooldown');}
+async function loadSnap(){const cam=zcam.value;if(!cam)return;const img=new Image();img.src='/snap/'+cam+'?t='+Date.now();
+img.onload=()=>{const c=zc;c.width=img.width;c.height=img.height;const x=c.getContext('2d');
+const draw=()=>{x.drawImage(img,0,0);if(poly.length){x.fillStyle='rgba(34,197,94,.30)';x.beginPath();poly.forEach((p,i)=>i?x.lineTo(p[0]*c.width,p[1]*c.height):x.moveTo(p[0]*c.width,p[1]*c.height));x.closePath();x.fill();x.strokeStyle='#22c55e';x.lineWidth=2;x.stroke();poly.forEach(p=>{x.beginPath();x.arc(p[0]*c.width,p[1]*c.height,5,0,7);x.fillStyle='#22c55e';x.fill();});}};
+draw();poly=[];zpts.textContent='Click to add points…';
+c.onclick=(ev)=>{const r=c.getBoundingClientRect();poly.push([+((ev.clientX-r.left)/r.width).toFixed(3),+((ev.clientY-r.top)/r.height).toFixed(3)]);draw();zpts.textContent=JSON.stringify(poly);};};}
+function clearZone(){poly=[];zpts.textContent='';const c=zc,x=c.getContext('2d');if(c.width)x.clearRect(0,0,c.width,c.height);}
+async function saveZone(){const cam=zcam.value;if(!cam)return;
+await api('/api/zones/'+cam,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({zones:poly.length>=3?[{poly,mode:zmode.value}]:[]})});
+alert('Zone saved ✓');}
+async function saveCfg(){await api('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+inference:{engine:engine.value,imgsz:+imgsz.value,conf:+conf.value,frame_skip:+skip.value},
+alerts:{cooldown_sec:+cool.value},
+notify:{webhook_url:webhook.value,telegram_bot:tgbot.value,telegram_chat:tgchat.value}})});
+alert('Settings saved ✓');}
+async function testNotify(){const r=await api('/api/notify_test',{method:'POST'});alert(r.queued?'Test alert queued ✓ (webhook/telegram must be set)':'Muted — cooldown active');}
 async function prune(){await api('/api/prune',{method:'POST'});loadEvents();}
 refresh();setInterval(refresh,5000);loadEvents();
 </script></body></html>

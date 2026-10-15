@@ -1,4 +1,4 @@
-"""إعدادات camdetect — تحميل/حفظ JSON مع قيم افتراضية آمنة."""
+"""camdetect config — JSON load/save with safe defaults."""
 import json
 from pathlib import Path
 
